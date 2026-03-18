@@ -52,11 +52,11 @@ _City weather details with user notes_
 
 ## Demo
 
-A live demo of the application is available at [Your Deployed URL].
+A live demo of the application is available at [citiweda.vercel.app](https://citiweda.vercel.app).
 
 ## Technical Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
+- **Framework**: [Next.js 16](https://nextjs.org/) with App Router
 - **Language**: [TypeScript 5.8](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/) (No UI frameworks)
 - **State Management**: [Zustand 5.0](https://github.com/pmndrs/zustand) with persist middleware
