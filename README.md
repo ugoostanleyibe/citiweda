@@ -2,7 +2,7 @@
 
 A modern weather application that provides real-time weather information for cities around the world, with favorites management, detailed weather views, and offline capabilities.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Jest](https://img.shields.io/badge/Jest-29.7-C21325?style=flat-square&logo=jest)](https://jestjs.io/)
@@ -97,7 +97,7 @@ src/
 
 ### Prerequisites
 
-- Node.js 20.9.0 or higher
+- Node.js 24 or higher
 - npm or yarn
 
 ### Installation Steps
