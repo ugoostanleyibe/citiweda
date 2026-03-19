@@ -7,6 +7,8 @@ import { WeatherInfo, City, Note } from '@/types';
 
 import { largestCities } from '@/constants';
 
+import { RateLimitError } from '@/utils';
+
 import { logger } from '@/utils';
 
 interface StoreState {
@@ -53,7 +55,6 @@ export const useMainStore = create<StoreState & StoreAction>()(
 
                 if (result.length > 0) {
                   const [{ weather, population, country, name, id }] = result;
-
                   addCity({ isFavorite: false, population, country, name, id });
                   setState({ currentCityId: id });
                   updateWeatherData(id, weather);
@@ -75,25 +76,38 @@ export const useMainStore = create<StoreState & StoreAction>()(
 
         const allCities = [...favorites, ...cities];
 
-        for (const city of allCities) {
+        /* Filter to only cities that need a refresh (no data or data older than 30 min) */
+
+        const dueCities = allCities.filter((city) => {
           const weather = weatherData[city.id];
 
-          /* Skip if we already have recent data (less than 30 minutes old) */
+          if (weather === undefined) return true;
 
-          if (weather !== undefined) {
-            const minutesSinceLastUpdate =
-              (new Date().getTime() - new Date(weather.lastUpdated).getTime()) /
-              (60 * 1000);
+          const minutesSinceLastUpdate =
+            (new Date().getTime() - new Date(weather.lastUpdated).getTime()) /
+            (60 * 1000);
 
-            if (minutesSinceLastUpdate < 30) {
-              continue;
+          return minutesSinceLastUpdate >= 30;
+        });
+
+        if (dueCities.length > 0) {
+          for (const city of dueCities) {
+            try {
+              updateWeatherData(city.id, await getWeatherInCity(city.name));
+            } catch (error) {
+              if (error instanceof RateLimitError) {
+                logger.warn('Rate limit hit — pausing weather fetches');
+                break;
+              }
+
+              logger.error(error);
             }
-          }
 
-          try {
-            updateWeatherData(city.id, await getWeatherInCity(city.name));
-          } catch (error) {
-            logger.error(error);
+            /* Delay between requests to avoid hitting rate limits */
+
+            if (city !== dueCities[dueCities.length - 1]) {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
           }
         }
       },
