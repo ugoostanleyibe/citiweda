@@ -55,8 +55,7 @@ export const useMainStore = create<StoreState & StoreAction>()(
                 }
               });
             },
-            () => setState({ isPermissionDenied: true }),
-            { enableHighAccuracy: true, timeout: 5000 }
+            () => setState({ isPermissionDenied: true })
           );
         } else if (currentCityId === '') {
           setState({ isPermissionDenied: true });
