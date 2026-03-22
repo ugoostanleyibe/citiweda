@@ -2,9 +2,9 @@ import { WeatherInfo, WeatherCity } from '@/types';
 
 const API_KEY = process.env.NEXT_PUBLIC_WEATHERSTACK_API_KEY;
 
-export const getWeatherInCity = async (query: string): Promise<WeatherInfo> => {
+export const getWeatherData = async (arg: string[]): Promise<WeatherInfo[]> => {
   const response = await fetch(
-    `https://api.weatherstack.com/current?access_key=${API_KEY}&query=${query}`
+    `https://api.weatherstack.com/current?access_key=${API_KEY}&query=${arg.join(';')}`
   );
 
   const json = await response.json();
@@ -13,7 +13,11 @@ export const getWeatherInCity = async (query: string): Promise<WeatherInfo> => {
     throw new Error(json.error?.info ?? 'Failed to fetch weather data');
   }
 
-  return parseWeatherData(json.current);
+  if (arg.length > 1) {
+    return json.map((entry: any) => parseWeatherData(entry.current));
+  }
+
+  return [parseWeatherData(json.current)];
 };
 
 export const searchCity = async (query: string): Promise<WeatherCity[]> => {

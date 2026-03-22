@@ -10,7 +10,7 @@ import { Space_Grotesk } from 'next/font/google';
 
 import { WeatherInfoPane, NotesSection, Header } from '@/components';
 
-import { getWeatherInCity } from '@/services/weather-service';
+import { getWeatherData } from '@/services/weather-service';
 
 import { useMainStore } from '@/stores';
 
@@ -20,7 +20,7 @@ import { appName } from '@/constants';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
-export default function WeatherInfoPage() {
+export default function CityWeatherInfoPage() {
   const { updateWeatherData, weatherData, cities } = useMainStore();
 
   const [isFetchingData, setIsFetchingData] = useState(false);
@@ -38,13 +38,14 @@ export default function WeatherInfoPage() {
     [cityId, cities]
   );
 
-  const fetchWeatherData = useCallback(async () => {
+  const obtainWeatherData = useCallback(async () => {
     if (weather === undefined) {
       setIsFetchingData(true);
     }
 
     try {
-      updateWeatherData(city!.id, await getWeatherInCity(city!.name));
+      const [weatherInfo] = await getWeatherData([city!.name]);
+      updateWeatherData(city!.id, weatherInfo);
     } catch (error) {
       logger.error(error);
     }
@@ -69,11 +70,11 @@ export default function WeatherInfoPage() {
         }
       }
 
-      fetchWeatherData();
+      obtainWeatherData();
     } else {
       router.push('/');
     }
-  }, [fetchWeatherData, weather, router, city]);
+  }, [obtainWeatherData, weather, router, city]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

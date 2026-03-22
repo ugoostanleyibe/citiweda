@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { getWeatherInCity, searchCity } from '@/services/weather-service';
+import { getWeatherData, searchCity } from '@/services/weather-service';
 
 import { WeatherInfo, City, Note } from '@/types';
 
@@ -89,12 +89,16 @@ export const useMainStore = create<StoreState & StoreAction>()(
         });
 
         if (dueCities.length > 0) {
-          for (const city of dueCities) {
-            try {
-              updateWeatherData(city.id, await getWeatherInCity(city.name));
-            } catch (error) {
-              logger.error(error);
-            }
+          try {
+            const results = await getWeatherData(
+              dueCities.map((city) => `${city.name}, ${city.country}`)
+            );
+
+            dueCities.forEach((city, index) => {
+              updateWeatherData(city.id, results[index]);
+            });
+          } catch (error) {
+            logger.error(error);
           }
         }
       },
