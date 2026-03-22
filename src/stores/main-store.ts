@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { getWeatherData, searchCity } from '@/services/weather-service';
+import { getWeatherInfo, searchCity } from '@/services/weather-service';
 
 import { WeatherInfo, City, Note } from '@/types';
 
@@ -49,6 +49,8 @@ export const useMainStore = create<StoreState & StoreAction>()(
           navigator.geolocation.getCurrentPosition(
             async ({ coords: { latitude, longitude } }) => {
               try {
+                await new Promise((resolve) => setTimeout(resolve, 696));
+
                 const result = await searchCity(`${latitude},${longitude}`);
 
                 if (result.length > 0) {
@@ -89,16 +91,21 @@ export const useMainStore = create<StoreState & StoreAction>()(
         });
 
         if (dueCities.length > 0) {
-          try {
-            const results = await getWeatherData(
-              dueCities.map((city) => `${city.name}, ${city.country}`)
-            );
+          for (const city of dueCities) {
+            try {
+              updateWeatherData(
+                city.id,
+                await getWeatherInfo(`${city.name},${city.country}`)
+              );
+            } catch (error) {
+              logger.error(error);
+            }
 
-            dueCities.forEach((city, index) => {
-              updateWeatherData(city.id, results[index]);
-            });
-          } catch (error) {
-            logger.error(error);
+            /* Delay between requests to avoid hitting rate limits */
+
+            if (city !== dueCities[dueCities.length - 1]) {
+              await new Promise((resolve) => setTimeout(resolve, 696));
+            }
           }
         }
       },

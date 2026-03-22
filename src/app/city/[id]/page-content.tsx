@@ -10,7 +10,7 @@ import { Space_Grotesk } from 'next/font/google';
 
 import { WeatherInfoPane, NotesSection, Header } from '@/components';
 
-import { getWeatherData } from '@/services/weather-service';
+import { getWeatherInfo } from '@/services/weather-service';
 
 import { useMainStore } from '@/stores';
 
@@ -44,8 +44,10 @@ export default function CityWeatherInfoPage() {
     }
 
     try {
-      const [weatherInfo] = await getWeatherData([city!.name]);
-      updateWeatherData(city!.id, weatherInfo);
+      updateWeatherData(
+        city!.id,
+        await getWeatherInfo(`${city!.name},${city!.country}`)
+      );
     } catch (error) {
       logger.error(error);
     }

@@ -22,7 +22,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     setIsLoadingPage(false);
-    fetchCurrentCity().then(() => fetchWeatherData());
+    fetchCurrentCity().then(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 696));
+      fetchWeatherData();
+    });
   }, [fetchCurrentCity, fetchWeatherData]);
 
   return (
