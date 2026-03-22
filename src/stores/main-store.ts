@@ -45,8 +45,8 @@ export const useMainStore = create<StoreState & StoreAction>()(
 
         if (navigator.geolocation !== undefined && currentCityId === '') {
           navigator.geolocation.getCurrentPosition(
-            ({ coords: { latitude, longitude } }) => {
-              searchCity(`${latitude},${longitude}`).then((matches) => {
+            async ({ coords: { latitude, longitude } }) => {
+              return searchCity(`${latitude},${longitude}`).then((matches) => {
                 if (matches.length > 0) {
                   const [{ weather, population, country, name, id }] = matches;
                   addCity({ isFavorite: false, population, country, name, id });
