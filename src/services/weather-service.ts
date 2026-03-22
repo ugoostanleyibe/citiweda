@@ -7,13 +7,15 @@ export const getWeatherInfo = async (query: string): Promise<WeatherInfo> => {
     `https://api.weatherstack.com/current?access_key=${API_KEY}&query=${query}`
   );
 
-  const json = await response.json();
+  const { current, success, error } = await response.json();
 
-  if (json.success === false) {
-    throw new Error(json.error?.info ?? 'Unable to obtain weather information');
+  if (success === false && error?.code === 106) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(getWeatherInfo(query)), 500);
+    });
   }
 
-  return parseWeatherData(json.current);
+  return parseWeatherData(current);
 };
 
 export const searchCity = async (query: string): Promise<WeatherCity[]> => {
@@ -21,9 +23,9 @@ export const searchCity = async (query: string): Promise<WeatherCity[]> => {
     `https://api.weatherstack.com/current?access_key=${API_KEY}&query=${query}`
   );
 
-  const { location, current: data } = await response.json();
+  const { location, current, success, error } = await response.json();
 
-  if (location !== undefined && data !== undefined) {
+  if (location !== undefined && current !== undefined) {
     const compositeId = `${location.name}-${location.country}`
       .replace(/\s+/g, '-')
       .toLowerCase();
@@ -32,7 +34,7 @@ export const searchCity = async (query: string): Promise<WeatherCity[]> => {
       {
         id: compositeId,
         name: location.name,
-        weather: parseWeatherData(data),
+        weather: parseWeatherData(current),
         country: location.country,
         isFavorite: false,
         population: 0
@@ -40,17 +42,23 @@ export const searchCity = async (query: string): Promise<WeatherCity[]> => {
     ];
   }
 
+  if (success === false && error?.code === 106) {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(searchCity(query)), 500);
+    });
+  }
+
   return [];
 };
 
 const parseWeatherData = (data: any): WeatherInfo => ({
-  description: data.weather_descriptions[0],
+  description: data?.weather_descriptions?.[0],
   lastUpdated: new Date().toISOString(),
-  temperature: data.temperature,
-  icon: data.weather_icons[0],
-  visibility: data.visibility,
-  windSpeed: data.wind_speed,
-  feelsLike: data.feelslike,
-  humidity: data.humidity,
-  pressure: data.pressure
+  temperature: data?.temperature,
+  icon: data?.weather_icons?.[0],
+  visibility: data?.visibility,
+  windSpeed: data?.wind_speed,
+  feelsLike: data?.feelslike,
+  humidity: data?.humidity,
+  pressure: data?.pressure
 });

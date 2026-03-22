@@ -21,11 +21,9 @@ export default function LandingPage() {
   const [isLoadingPage, setIsLoadingPage] = useState(true);
 
   useEffect(() => {
+    fetchCurrentCity();
+    fetchWeatherData();
     setIsLoadingPage(false);
-    fetchCurrentCity().then(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 696));
-      fetchWeatherData();
-    });
   }, [fetchCurrentCity, fetchWeatherData]);
 
   return (

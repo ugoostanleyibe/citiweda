@@ -14,9 +14,9 @@ import { getWeatherInfo } from '@/services/weather-service';
 
 import { useMainStore } from '@/stores';
 
-import { logger, cls } from '@/utils';
-
 import { appName } from '@/constants';
+
+import { cls } from '@/utils';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
@@ -38,21 +38,14 @@ export default function CityWeatherInfoPage() {
     [cityId, cities]
   );
 
-  const obtainWeatherData = useCallback(async () => {
+  const obtainWeatherData = useCallback(() => {
     if (weather === undefined) {
       setIsFetchingData(true);
     }
 
-    try {
-      updateWeatherData(
-        city!.id,
-        await getWeatherInfo(`${city!.name},${city!.country}`)
-      );
-    } catch (error) {
-      logger.error(error);
-    }
-
-    setIsFetchingData(false);
+    getWeatherInfo(`${city!.name},${city!.country}`)
+      .then((info) => updateWeatherData(city!.id, info))
+      .finally(() => setIsFetchingData(false));
   }, [updateWeatherData, weather, city]);
 
   useEffect(() => {

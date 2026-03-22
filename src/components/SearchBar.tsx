@@ -6,8 +6,6 @@ import { searchCity } from '@/services/weather-service';
 
 import { useMainStore } from '@/stores';
 
-import { logger } from '@/utils';
-
 export const SearchBar = () => {
   const { updateWeatherData, addCity } = useMainStore();
 
@@ -23,29 +21,32 @@ export const SearchBar = () => {
       setIsSearching(true);
       setError('');
 
-      try {
-        const data = await searchCity(query);
+      searchCity(query)
+        .then((matches) => {
+          if (matches.length === 0) {
+            setError(`No city found with name '${query}'`);
+          } else {
+            const [{ isFavorite, population, weather, country, name, id }] =
+              matches;
 
-        if (data.length === 0) {
-          setError(`No city found with name '${query}'`);
-        } else {
-          const [{ isFavorite, population, weather, country, name, id }] = data;
-          updateWeatherData(id, weather);
-          setQuery('');
-          addCity({
-            isFavorite,
-            population,
-            country,
-            name,
-            id
-          });
-        }
-      } catch (error) {
-        setError('Unable to perform search');
-        logger.error(error);
-      }
+            updateWeatherData(id, weather);
+            setQuery('');
 
-      setIsSearching(false);
+            addCity({
+              isFavorite,
+              population,
+              country,
+              name,
+              id
+            });
+          }
+        })
+        .catch(() => {
+          setError('Unable to perform search');
+        })
+        .finally(() => {
+          setIsSearching(false);
+        });
     } else if (query.trim() !== '') {
       setError('No internet connection');
     }

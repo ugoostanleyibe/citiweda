@@ -7,8 +7,6 @@ import { WeatherInfo, City, Note } from '@/types';
 
 import { largestCities } from '@/constants';
 
-import { logger } from '@/utils';
-
 interface StoreState {
   weatherData: Record<string, WeatherInfo>;
   isPermissionDenied: boolean;
@@ -47,23 +45,18 @@ export const useMainStore = create<StoreState & StoreAction>()(
 
         if (navigator.geolocation !== undefined && currentCityId === '') {
           navigator.geolocation.getCurrentPosition(
-            async ({ coords: { latitude, longitude } }) => {
-              try {
-                await new Promise((resolve) => setTimeout(resolve, 696));
-
-                const result = await searchCity(`${latitude},${longitude}`);
-
-                if (result.length > 0) {
-                  const [{ weather, population, country, name, id }] = result;
+            ({ coords: { latitude, longitude } }) => {
+              searchCity(`${latitude},${longitude}`).then((matches) => {
+                if (matches.length > 0) {
+                  const [{ weather, population, country, name, id }] = matches;
                   addCity({ isFavorite: false, population, country, name, id });
                   setState({ currentCityId: id });
                   updateWeatherData(id, weather);
                 }
-              } catch (error) {
-                logger.error(error);
-              }
+              });
             },
-            () => setState({ isPermissionDenied: true })
+            () => setState({ isPermissionDenied: true }),
+            { enableHighAccuracy: true, timeout: 5000 }
           );
         } else if (currentCityId === '') {
           setState({ isPermissionDenied: true });
@@ -92,20 +85,9 @@ export const useMainStore = create<StoreState & StoreAction>()(
 
         if (dueCities.length > 0) {
           for (const city of dueCities) {
-            try {
-              updateWeatherData(
-                city.id,
-                await getWeatherInfo(`${city.name},${city.country}`)
-              );
-            } catch (error) {
-              logger.error(error);
-            }
-
-            /* Delay between requests to avoid hitting rate limits */
-
-            if (city !== dueCities[dueCities.length - 1]) {
-              await new Promise((resolve) => setTimeout(resolve, 696));
-            }
+            getWeatherInfo(`${city.name},${city.country}`).then((info) => {
+              updateWeatherData(city.id, info);
+            });
           }
         }
       },
