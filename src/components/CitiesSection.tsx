@@ -1,19 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { useMainStore } from '@/stores';
 
 import { CityTile } from '@/components';
 
 export const CitiesSection = () => {
-  const { fetchWeatherData, weatherData, favorites, cities } = useMainStore();
-
-  useEffect(() => {
-    fetchWeatherData();
-  }, [fetchWeatherData]);
-
-  /* Sort cities alphabetically */
+  const { weatherData, favorites, cities } = useMainStore();
 
   const sortedCities = [...cities].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -21,46 +13,46 @@ export const CitiesSection = () => {
     return a.name.localeCompare(b.name);
   });
 
-  if (sortedCities.length === 0 && sortedFavorites.length === 0) {
+  if (sortedFavorites.length > 0 || sortedCities.length > 0) {
     return (
-      <p className="w-full py-20 text-center text-rich-lavender">
-        No cities found. Try searching for a city.
-      </p>
+      <section className="flex w-full flex-col gap-6">
+        {sortedFavorites.length > 0 && (
+          <section className="flex w-full flex-col gap-3">
+            <h2 className="font-trap text-xl text-rich-lavender">Favorites</h2>
+            <article className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {sortedFavorites.map((city) => (
+                <CityTile
+                  key={city.id}
+                  weather={weatherData[city.id]}
+                  city={city}
+                  isFave
+                />
+              ))}
+            </article>
+          </section>
+        )}
+        {sortedCities.length > 0 && (
+          <section className="flex w-full flex-col gap-3">
+            <h2 className="font-trap text-xl text-rich-lavender">All Cities</h2>
+            <article className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {sortedCities.map((city) => (
+                <CityTile
+                  key={city.id}
+                  weather={weatherData[city.id]}
+                  isFave={false}
+                  city={city}
+                />
+              ))}
+            </article>
+          </section>
+        )}
+      </section>
     );
   }
 
   return (
-    <section className="flex w-full flex-col gap-6">
-      {sortedFavorites.length > 0 && (
-        <section className="flex w-full flex-col gap-3">
-          <h2 className="font-trap text-xl text-rich-lavender">Favorites</h2>
-          <article className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sortedFavorites.map((city) => (
-              <CityTile
-                key={city.id}
-                weather={weatherData[city.id]}
-                city={city}
-                isFave
-              />
-            ))}
-          </article>
-        </section>
-      )}
-      {sortedCities.length > 0 && (
-        <section className="flex w-full flex-col gap-3">
-          <h2 className="font-trap text-xl text-rich-lavender">All Cities</h2>
-          <article className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sortedCities.map((city) => (
-              <CityTile
-                key={city.id}
-                weather={weatherData[city.id]}
-                isFave={false}
-                city={city}
-              />
-            ))}
-          </article>
-        </section>
-      )}
-    </section>
+    <p className="w-full py-20 text-center text-rich-lavender">
+      No cities found. Try searching for a city.
+    </p>
   );
 };

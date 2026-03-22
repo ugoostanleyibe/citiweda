@@ -29,12 +29,9 @@ export const SearchBar = () => {
         if (data.length === 0) {
           setError(`No city found with name '${query}'`);
         } else {
-          const [{ weather, isFavorite, population, country, name, id }] = data;
-
+          const [{ isFavorite, population, weather, country, name, id }] = data;
           updateWeatherData(id, weather);
-
           setQuery('');
-
           addCity({
             isFavorite,
             population,
@@ -80,8 +77,8 @@ export const SearchBar = () => {
             >
               <circle
                 stroke="currentColor"
-                strokeWidth="4"
                 className="opacity-25"
+                strokeWidth="4"
                 cx="12"
                 cy="12"
                 r="10"

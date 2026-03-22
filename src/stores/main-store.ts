@@ -7,8 +7,6 @@ import { WeatherInfo, City, Note } from '@/types';
 
 import { largestCities } from '@/constants';
 
-import { RateLimitError } from '@/utils';
-
 import { logger } from '@/utils';
 
 interface StoreState {
@@ -21,11 +19,11 @@ interface StoreState {
 }
 
 interface StoreAction {
-  addToFavorites: (data: City) => void;
   updateWeatherData: (cityId: string, data: WeatherInfo) => void;
   removeFromFavorites: (cityId: string) => void;
   fetchCurrentCity: () => Promise<void>;
   fetchWeatherData: () => Promise<void>;
+  addToFavorites: (data: City) => void;
   removeCity: (cityId: string) => void;
   deleteNote: (cityId: string) => void;
   saveNote: (data: Note) => void;
@@ -95,18 +93,7 @@ export const useMainStore = create<StoreState & StoreAction>()(
             try {
               updateWeatherData(city.id, await getWeatherInCity(city.name));
             } catch (error) {
-              if (error instanceof RateLimitError) {
-                logger.warn('Rate limit hit — pausing weather fetches');
-                break;
-              }
-
               logger.error(error);
-            }
-
-            /* Delay between requests to avoid hitting rate limits */
-
-            if (city !== dueCities[dueCities.length - 1]) {
-              await new Promise((resolve) => setTimeout(resolve, 1000));
             }
           }
         }

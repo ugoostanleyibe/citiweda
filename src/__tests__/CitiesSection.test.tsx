@@ -9,8 +9,6 @@ jest.mock('@/stores/main-store', () => ({
 }));
 
 describe('CitiesSection', () => {
-  const mockFetchWeatherData = jest.fn();
-
   const mockWeatherData = {
     'tokyo-japan': {
       icon: 'tokyo-icon-url',
@@ -76,16 +74,10 @@ describe('CitiesSection', () => {
 
   beforeEach(() => {
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: mockWeatherData,
       favorites: mockFavorites,
       cities: mockCities
     });
-  });
-
-  it('should fetch weather data on mount', () => {
-    render(<CitiesSection />);
-    expect(mockFetchWeatherData).toHaveBeenCalledTimes(1);
   });
 
   it('should render both favorites and cities sections when both exist', () => {
@@ -125,7 +117,6 @@ describe('CitiesSection', () => {
     ];
 
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: mockWeatherData,
       favorites: mockFavorites,
       cities: mockCitiesPlus
@@ -165,7 +156,6 @@ describe('CitiesSection', () => {
     ];
 
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: mockWeatherData,
       favorites: mockFavoritesPlus,
       cities: mockCities
@@ -183,7 +173,6 @@ describe('CitiesSection', () => {
 
   it('should display message when no cities or favorites exist', () => {
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: {},
       favorites: [],
       cities: []
@@ -201,7 +190,6 @@ describe('CitiesSection', () => {
 
   it('should render only cities section when no favorites exist', () => {
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: mockWeatherData,
       cities: mockCities,
       favorites: []
@@ -218,7 +206,6 @@ describe('CitiesSection', () => {
 
   it('should render only favorites section when no cities exist', () => {
     (useMainStore as unknown as jest.Mock).mockReturnValue({
-      fetchWeatherData: mockFetchWeatherData,
       weatherData: mockWeatherData,
       favorites: mockFavorites,
       cities: []

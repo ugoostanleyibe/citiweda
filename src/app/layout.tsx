@@ -27,7 +27,7 @@ const Trap = localFont({
 
 export default async function RootLayout({ children }: LayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={cls(
           'min-h-screen bg-gradient-to-b from-dark-purple to-vampire-black',

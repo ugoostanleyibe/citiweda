@@ -1,3 +1,7 @@
+export interface WeatherCity extends City {
+  weather: WeatherInfo;
+}
+
 export interface WeatherInfo {
   temperature: number;
   description: string;
@@ -8,10 +12,6 @@ export interface WeatherInfo {
   pressure: number;
   humidity: number;
   icon: string;
-}
-
-export interface WeatherCity extends City {
-  weather: WeatherInfo;
 }
 
 export interface City {

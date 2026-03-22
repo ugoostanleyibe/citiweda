@@ -1,7 +1,5 @@
 import { WeatherInfo, WeatherCity } from '@/types';
 
-import { RateLimitError } from '@/utils';
-
 const API_KEY = process.env.NEXT_PUBLIC_WEATHERSTACK_API_KEY;
 
 export const getWeatherInCity = async (query: string): Promise<WeatherInfo> => {
@@ -12,11 +10,7 @@ export const getWeatherInCity = async (query: string): Promise<WeatherInfo> => {
   const json = await response.json();
 
   if (json.success === false) {
-    if (json.error?.code !== 106) {
-      throw new Error(json.error?.info ?? 'Failed to fetch weather data');
-    }
-
-    throw new RateLimitError();
+    throw new Error(json.error?.info ?? 'Failed to fetch weather data');
   }
 
   return parseWeatherData(json.current);
@@ -29,20 +23,24 @@ export const searchCity = async (query: string): Promise<WeatherCity[]> => {
 
   const { location, current: data } = await response.json();
 
-  const compositeId = `${location.name}-${location.country}`
-    .replace(/\s+/g, '-')
-    .toLowerCase();
+  if (location !== undefined && data !== undefined) {
+    const compositeId = `${location.name}-${location.country}`
+      .replace(/\s+/g, '-')
+      .toLowerCase();
 
-  return [
-    {
-      id: compositeId,
-      name: location.name,
-      weather: parseWeatherData(data),
-      country: location.country,
-      isFavorite: false,
-      population: 0
-    }
-  ];
+    return [
+      {
+        id: compositeId,
+        name: location.name,
+        weather: parseWeatherData(data),
+        country: location.country,
+        isFavorite: false,
+        population: 0
+      }
+    ];
+  }
+
+  return [];
 };
 
 const parseWeatherData = (data: any): WeatherInfo => ({

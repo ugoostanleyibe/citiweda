@@ -35,7 +35,8 @@ export const WeatherInfoPane = ({
               <Image
                 alt={weather.description}
                 src={weather.icon}
-                objectFit="cover"
+                className="rounded-md object-cover"
+                sizes="48px"
                 fill
               />
             </article>

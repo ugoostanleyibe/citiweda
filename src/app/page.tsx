@@ -15,14 +15,15 @@ import { cls } from '@/utils';
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
 export default function LandingPage() {
-  const { isPermissionDenied, fetchCurrentCity } = useMainStore();
+  const { isPermissionDenied, fetchCurrentCity, fetchWeatherData } =
+    useMainStore();
 
   const [isLoadingPage, setIsLoadingPage] = useState(true);
 
   useEffect(() => {
-    fetchCurrentCity();
     setIsLoadingPage(false);
-  }, [fetchCurrentCity]);
+    fetchCurrentCity().then(() => fetchWeatherData());
+  }, [fetchCurrentCity, fetchWeatherData]);
 
   return (
     <main

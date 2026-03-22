@@ -2,13 +2,6 @@ import { type ClassValue, clsx } from 'clsx';
 
 import { twMerge } from 'tailwind-merge';
 
-export class RateLimitError extends Error {
-  constructor() {
-    super('API rate limit reached');
-    this.name = 'RateLimitError';
-  }
-}
-
 class Logger {
   private static instance: Logger;
 
